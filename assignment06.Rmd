@@ -38,3 +38,24 @@ knitr::include_graphics("image2.jpeg")
 knitr::include_graphics("image3.jpg")
 ```
 
+## Question 4
+
+*Consider a population where it is known that 0.49 of observations have a value of 0 and 0.51 of observations
+have a value of 1. Approximately what accuracy can be achieved by simply guessing the same value for all
+observations? What number should you predict?*
+
+You would get a 51% accuracy if you guess 1 for all observations and 49 if you guess 0. What you want to predict depends on context. Even if guessing 1 leads to more accuracy, getting the observations that have a value of 0 may be very important (e.g. for targeting a program)
+
+*Consider a population where it is known that 0.99 of observations have a value of 0 and 0.01 of observations
+have a value of 1. Approximately what accuracy can be achieved by simply guessing the same value for all
+observations? What number should you predict?*
+
+You would get a 1% accuracy if you guess 1 for all observations and 99% if you guess 0. What you want to predict depends on context. Even if guessing 0 leads to more accuracy, getting that one observation that has a value of 1 may be very important (e.g. for example if you are trying to predict cancer). You may want to use sensitivity in this case.
+
+*Explain why it is important to consider context when comparing calculated accuracy in different supervised
+machine learning tasks?*
+Based on your policy goal, positives, true negatives, false positives, and false negatives carry different costs. This is why it's good to consider other measures other than accuracy.
+
+are you doing a better job in the second case? not really because it's a better model
+relative errors?
+
