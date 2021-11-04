@@ -59,3 +59,187 @@ Based on your policy goal, positives, true negatives, false positives, and false
 are you doing a better job in the second case? not really because it's a better model
 relative errors?
 
+## Question 5
+1. Divide the marbles data set into a training set with 80% of observations and a testing set 20% of
+observations. Set the seed to 20200229 before sampling.
+2. Use count() and library(ggplot2) to develop and justify a intuitive/mental model for predicting
+black marbles.
+3. Construct a custom function that takes a vector of sizes and returns a vector of predicted colors. Apply
+it to the testing data. The R4DS chapter on functions is helpful.
+4. Construct a custom function that takes y and y_hat that returns calculated accuracy and a confusion
+matrix. Until now, we have only returned one object from a custom function. Use list()
+inside of return() to return more than one object. Apply it to the data from part 3. Do not use
+yardstick::conf_mat() or caret::confusionMatrix().
+5. Using the same testing and training data, estimate a decision tree/CART model with functions from
+library(parnsip). Use the “rpart” engine.
+6. Does the decision tree/CART model generate the same predictions on the testing data as the model
+from part 2? Why or why not?
+
+```{r loading}
+set.seed(20200229)
+
+marbles_original <- read_csv("Data/marbles.csv", col_types = cols(col_character()))
+
+# creating a split object
+marbles_split <- initial_split(data=marbles_original, prop=0.8)
+
+# create the training and testing data
+marbles_train <- training(x = marbles_split)
+marbles_test <- testing(x = marbles_split) # putting this to the side
+
+```
+
+We can use a model that predicts black when we have a large sized ball.
+
+```{r model}
+
+marbles_train <- marbles_train %>%
+  count(color, size) %>% 
+  ggplot(aes(x=size, y=n, fill=color))+
+  geom_bar(position = "stack", stat="identity") 
+
+
+```
+
+
+```{r function1}
+
+predict_marbles <- function(x) {
+  
+  marbles_predictions <- case_when(
+  x=="large" ~ "black",
+  x=="small" ~ "white"
+  )
+
+return(marbles_predictions)
+
+}
+  
+predict_marbles(x=c("large", "small", "small","large")) #works!
+ 
+
+```
+
+```{r applying_function}
+
+marbles_train <- marbles_train %>%
+  mutate(y_hat=predict_marbles(marbles_train$size))
+
+predict_marbles(marbles_train$size)
+```
+
+
+
+```{r applying_function}
+
+accuracy_confusion <- function(x) {
+  
+  accuracy <- mean(
+  y==y_hat
+  )
+  
+  confusion <-table(
+    "pred"=marbles_train$y_hat, "truth"= marbles_train$color
+  )
+
+return(list(accuracy, confusion)
+
+}
+  
+accuracy_confusion(x=c("large", "small", "small","large")) 
+
+
+```
+
+```{r decision_tree}
+
+cart_mod <- decision_tree() %>%
+  set_engine(engine="rpart") %>%
+  set_mode(mode="classification")
+
+cart_fit <- cart_mod %>%
+  fit(formula= color ~., data=marbles_train)
+
+rpart.plot::rpart.plot(x=cart_fit$fit)
+
+
+```
+
+## Question 6
+
+```{r data}
+
+# input the data
+rats <- tribble(
+  ~rat_burrow, ~pizza_distance,
+  1, 0.01,
+  1, 0.05,
+  1, 0.08,
+  0, 0.1,
+  0, 0.12,
+  1, 0.2,
+  1, 0.3,
+  1, 0.5,
+  1, 0.75,
+  0, 0.9,
+  1, 1,
+  0, 1.2,
+  0, 2.2,
+  0, 2.3,
+  0, 2.5,
+  1, 3,
+  0, 3.5,
+  0, 4,
+  0, 5,
+  0, 7
+) %>%
+  mutate(rat_burrow = factor(rat_burrow))
+
+# split into training and testing data
+split <- initial_split(rats, prop = 0.75)
+
+rats_training <- training(split)
+
+rats_testing <- testing(split)
+
+rats_k1 <- vfold_cv(data = rats_training,
+                    v = 3)
+
+rats_k3 <- vfold_cv(data = rats_training,
+                    v = 3)
+
+rats_kn <- vfold_cv(data = rats_training,
+                    v = 3)
+```
+
+```{r analysis_data}
+
+resample1_data <- rats_k1$splits[[1]] %>%
+  analysis()
+
+
+```
+
+```{r analysis_resample1}
+
+resample1_assessment <- rats_k1$splits[[1]] %>% #KNN & k=1
+  assessment()
+
+```
+
+```{r analysis_resample2}
+
+
+resample1_assessment <- rats_k3$splits[[1]] %>% #KNN & k=2
+  assessment()
+
+```
+
+
+```{r analysis_resample3}
+
+resample1_assessment <- rats_kn$splits[[1]] %>% #KNN & k=3
+  assessment()
+
+```
+
