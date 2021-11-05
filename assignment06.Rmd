@@ -12,15 +12,16 @@ library(haven)
 library(tidymodels)
 library(purrr)
 library(parsnip)
-library(rpart)
+library(rpart.plot)
 ```
 
 ## Question 1
 
-RMSE=
-MAE=
+RMSE=2.10
+MAE=1.6
 
-Because if the squaring, RMSE penalizes large errors more than MSA does. 
+Because of the squaring, RMSE penalizes large errors more than MSA does.
+
 ```{r rmse}
 knitr::include_graphics("image0 (1).jpeg")
 
@@ -28,12 +29,19 @@ knitr::include_graphics("image0 (1).jpeg")
 
 ## Question 2
 
+ACCURACY= 70%
+PRECISION= 75%
+RECALL/SENSITIVITY= 60%
+
 ```{r confusion}
 knitr::include_graphics("image2.jpeg")
 ```
 
 
 ## Question 3
+
+ACCURACY= 67%
+MISSCLASSIFICATION RATE= 34%
 
 ```{r multiclass}
 knitr::include_graphics("image3.jpg")
@@ -79,8 +87,6 @@ from part 2? Why or why not?
 ```{r loading}
 set.seed(20200229)
 
-marbles_original <- read_csv("Data/marbles.csv", col_types = cols(col_character()))
-
 # creating a split object
 marbles_split <- initial_split(data=marbles_original, prop=0.8)
 
@@ -89,7 +95,7 @@ marbles_train <- training(x = marbles_split)
 marbles_test <- testing(x = marbles_split) # putting this to the side
 
 marbles_train_keep <- marbles_train %>%
-  mutate(color=as_factor(color))
+  mutate(color=as_factor(color)) ## doing this here to keep the original train data for exercise 6
 
 ```
 
@@ -149,7 +155,7 @@ return(list(accuracy, confusion))
 
 }
   
-accuracy_confusion(marbles_test$color, marbles_test$y_hat) #testing the function 
+accuracy_confusion(marbles_test$color, marbles_test$y_hat) #testing the function on the testing dataset 
 
 #accuracy us 76% and the confusion matrix is below
 
@@ -162,18 +168,24 @@ cart_mod <- decision_tree() %>%
   set_engine(engine="rpart") %>%
   set_mode(mode="classification")
 
-cart_fit <- cart_mod %>%
-  fit(formula= color ~., data=marbles_train_keep) #or original
+cart_fit <- cart_mod %>% #fitting the model
+  fit(formula= color ~., data=marbles_train_keep) #using the original train data set where color is a factor
 
-rpart.plot::rpart.plot(x=cart_fit$fit)
+rpart.plot::rpart.plot(x=cart_fit$fit) # creating a tree
+
+```
+
+```{r tree_predictions}
 
 tree_predictions <- bind_cols(
   marbles_test,
   predict(cart_fit, marbles_test)
-)
+) # predicting on the testing dataset
 
-accuracy_confusion(tree_predictions$color, tree_predictions$.pred.class)
-# notice that they are producing the same predictions
+accuracy_confusion(tree_predictions$color, tree_predictions$.pred_class)
+
+# notice that they are producing the same predictions - 76% accuracy. This is because the tree does the same thing as our custom function, it predicts color based on the size. 
+
 ```
 
 ## Question 6
@@ -228,16 +240,19 @@ rats_kn <- vfold_cv(data = rats_training,
 analysis(rats_k1$splits[[1]]) # this is for testing
 assessment(rats_k1$splits[[1]]) # this is for training
 
-# Calculating Y hat by hand with k=1
+rats_k1_assessment <- as_tibble(assessment(rats_k1$splits[[1]])) # creating a tibble for assessment
 
-predictions_k1=c(0, 0, 0, 0, 1, 0, 0, 0, 1, 1)
+predictions_k1=c(1, 1, 0, 0, 1) #calculating Y hat by hand with k=1
 
-rats_k1 <- bind_cols(
-  assessment(rats_k1$splits[[1]])
+rats_k1_assessment <- bind_cols(
+  rats_k1_assessment,
   predictions_k1
-)
+) %>%
+  rename(...3 = y_hat) ## why cannot rename
 
-knitr::kable()
+knitr::kable(rats_k1_assessment) #generating a table
+
+accuracy_confusion(rats_k1_assessment$rat_burrow, rats_k1_assessment$...3) # only 20% accuracy
 
 ```
 
@@ -246,9 +261,19 @@ knitr::kable()
 analysis(rats_k3$splits[[1]]) # this is for testing
 assessment(rats_k3$splits[[1]]) # this is for training
 
-# Calculating Y hat by hand with k=3
+rats_k3_assessment <- as_tibble(assessment(rats_k3$splits[[1]])) # creating a tibble for assessment
 
-y_hat=c()
+predictions_k3=c(0, 0, 0, 0, 0) #calculating Y hat by hand with k=3
+
+rats_k3_assessment <- bind_cols(
+  rats_k3_assessment,
+  predictions_k3
+) %>%
+  rename(...3 = y_hat) ## why cannot rename
+
+knitr::kable(rats_k1_assessment) #generating a table
+
+accuracy_confusion(rats_k3_assessment$rat_burrow, rats_k3_assessment$...3) # 80% accuracy
 
 ```
 
@@ -257,11 +282,22 @@ y_hat=c()
 analysis(rats_kn$splits[[1]]) # this is for testing
 assessment(rats_kn$splits[[1]]) # this is for training
 
-# Calculating Y hat by hand with k=n
+rats_kn_assessment <- as_tibble(assessment(rats_kn$splits[[1]])) # creating a tibble for assessment
 
-predictions_kn=c(0, 0, 1, 0, 0, 1, )
+predictions_kn=c(1, 1, 1, 1, 1) #calculating Y hat by hand with k=n
+
+rats_kn_assessment <- bind_cols(
+  rats_kn_assessment,
+  predictions_kn
+) %>%
+  rename(...3 = y_hat) ## why cannot rename
+
+knitr::kable(rats_kn_assessment) #generating a table
+
+accuracy_confusion(rats_kn_assessment$rat_burrow, rats_k3_assessment$...3) # 40% accuracy
+
 
 ```
 
-
+The last was the easiest because we were just taking the majority? Hardest was the first one?
 
