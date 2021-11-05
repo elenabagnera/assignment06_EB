@@ -12,6 +12,7 @@ library(haven)
 library(tidymodels)
 library(purrr)
 library(parsnip)
+library(rpart)
 ```
 
 ## Question 1
@@ -87,6 +88,9 @@ marbles_split <- initial_split(data=marbles_original, prop=0.8)
 marbles_train <- training(x = marbles_split)
 marbles_test <- testing(x = marbles_split) # putting this to the side
 
+marbles_train_keep <- marbles_train %>%
+  mutate(color=as_factor(color))
+
 ```
 
 We can use a model that predicts black when we have a large sized ball.
@@ -107,7 +111,7 @@ marbles_train <- marbles_train %>%
 predict_marbles <- function(x) {
   
   marbles_predictions <- case_when(
-  x=="large" ~ "black",
+  x=="big" ~ "black",
   x=="small" ~ "white"
   )
 
@@ -115,7 +119,7 @@ return(marbles_predictions)
 
 }
   
-predict_marbles(x=c("large", "small", "small","large")) #works!
+predict_marbles(x=c("big", "small", "small","big")) #works!
  
 
 ```
@@ -123,7 +127,7 @@ predict_marbles(x=c("large", "small", "small","large")) #works!
 ```{r applying_function}
 
 marbles_test <- marbles_test %>%
-  mutate(y_hat=predict_marbles(size)) #not working properly
+  mutate(y_hat=predict_marbles(size)) #why using testing data?
 
 ```
 
@@ -147,6 +151,8 @@ return(list(accuracy, confusion))
   
 accuracy_confusion(marbles_test$color, marbles_test$y_hat) #testing the function 
 
+#accuracy us 76% and the confusion matrix is below
+
 
 ```
 
@@ -157,7 +163,7 @@ cart_mod <- decision_tree() %>%
   set_mode(mode="classification")
 
 cart_fit <- cart_mod %>%
-  fit(formula= color ~., data=marbles_original) #or original?
+  fit(formula= color ~., data=marbles_train_keep) #or original
 
 rpart.plot::rpart.plot(x=cart_fit$fit)
 
