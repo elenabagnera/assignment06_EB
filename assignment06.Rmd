@@ -122,31 +122,30 @@ predict_marbles(x=c("large", "small", "small","large")) #works!
 
 ```{r applying_function}
 
-marbles_train <- marbles_train %>%
-  mutate(y_hat=predict_marbles(marbles_train$size))
+marbles_test <- marbles_test %>%
+  mutate(y_hat=predict_marbles(size)) #not working properly
 
-predict_marbles(marbles_train$size)
 ```
 
 
 
 ```{r applying_function}
 
-accuracy_confusion <- function(x) {
+accuracy_confusion <- function(color, y_hat) {
   
   accuracy <- mean(
-  y==y_hat
+  color==y_hat
   )
   
   confusion <-table(
-    "pred"=marbles_train$y_hat, "truth"= marbles_train$color
+    "pred"=y_hat, "truth"= color
   )
 
-return(list(accuracy, confusion)
+return(list(accuracy, confusion))
 
 }
   
-accuracy_confusion(x=c("large", "small", "small","large")) 
+accuracy_confusion(marbles_test$color, marbles_test$y_hat) #testing the function 
 
 
 ```
@@ -158,11 +157,17 @@ cart_mod <- decision_tree() %>%
   set_mode(mode="classification")
 
 cart_fit <- cart_mod %>%
-  fit(formula= color ~., data=marbles_train)
+  fit(formula= color ~., data=marbles_original) #or original?
 
 rpart.plot::rpart.plot(x=cart_fit$fit)
 
+tree_predictions <- bind_cols(
+  marbles_test,
+  predict(cart_fit, marbles_test)
+)
 
+accuracy_confusion(tree_predictions$color, tree_predictions$.pred.class)
+# notice that they are producing the same predictions
 ```
 
 ## Question 6
