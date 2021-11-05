@@ -53,20 +53,20 @@ knitr::include_graphics("image3.jpg")
 have a value of 1. Approximately what accuracy can be achieved by simply guessing the same value for all
 observations? What number should you predict?*
 
-You would get a 51% accuracy if you guess 1 for all observations and 49 if you guess 0. What you want to predict depends on context. Even if guessing 1 leads to more accuracy, getting the observations that have a value of 0 may be very important (e.g. for targeting a program)
+You would get a 51% accuracy if you guess 1 for all observations and 49 if you guess 0. To maximize accuracy, you would predict 1.
 
-*Consider a population where it is known that 0.99 of observations have a value of 0 and 0.01 of observations
+* Consider a population where it is known that 0.99 of observations have a value of 0 and 0.01 of observations
 have a value of 1. Approximately what accuracy can be achieved by simply guessing the same value for all
 observations? What number should you predict?*
 
-You would get a 1% accuracy if you guess 1 for all observations and 99% if you guess 0. What you want to predict depends on context. Even if guessing 0 leads to more accuracy, getting that one observation that has a value of 1 may be very important (e.g. for example if you are trying to predict cancer). You may want to use sensitivity in this case.
+You would get a 1% accuracy if you guess 1 for all observations and 99% if you guess 0. What you want to predict depends on context. If you are maximizing for efficiency, you should predict 0. 
 
-*Explain why it is important to consider context when comparing calculated accuracy in different supervised
+* Explain why it is important to consider context when comparing calculated accuracy in different supervised
 machine learning tasks?*
-Based on your policy goal, positives, true negatives, false positives, and false negatives carry different costs. This is why it's good to consider other measures other than accuracy.
+Based on your policy goal, positives, true negatives, false positives, and false negatives carry different costs. This is why it's good to consider other measures other than accuracy, such as sensitivity. In the secodn case for example, it may be very important to predict the 1 right, eveen if that means having a model that has less accuracy. One solution would be to lower the threshold for predicting a 1.
 
-are you doing a better job in the second case? not really because it's a better model
-relative errors?
+Another point to nitice, is that while the second model is performing significantly better, this is not because it's a better model, but simply because the underlying data is skewed towards 0.
+
 
 ## Question 5
 1. Divide the marbles data set into a training set with 80% of observations and a testing set 20% of
