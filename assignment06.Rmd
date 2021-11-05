@@ -69,26 +69,15 @@ Another point to notice, is that while the second model is performing significan
 
 
 ## Question 5
-1. Divide the marbles data set into a training set with 80% of observations and a testing set 20% of
-observations. Set the seed to 20200229 before sampling.
-2. Use count() and library(ggplot2) to develop and justify a intuitive/mental model for predicting
-black marbles.
-3. Construct a custom function that takes a vector of sizes and returns a vector of predicted colors. Apply
-it to the testing data. The R4DS chapter on functions is helpful.
-4. Construct a custom function that takes y and y_hat that returns calculated accuracy and a confusion
-matrix. Until now, we have only returned one object from a custom function. Use list()
-inside of return() to return more than one object. Apply it to the data from part 3. Do not use
-yardstick::conf_mat() or caret::confusionMatrix().
-5. Using the same testing and training data, estimate a decision tree/CART model with functions from
-library(parnsip). Use the “rpart” engine.
-6. Does the decision tree/CART model generate the same predictions on the testing data as the model
-from part 2? Why or why not?
 
 ```{r loading}
+
 set.seed(20200229)
 
+marbles <- read_csv("/Users/farahkaddah/Documents/GitHub/assignment06_EB/Data/marbles.csv") # notice I am using farah's laptop due to my issue with R studio so I had to copy the whole path
+
 # creating a split object
-marbles_split <- initial_split(data=marbles_original, prop=0.8)
+marbles_split <- initial_split(data=marbles, prop=0.8)
 
 # create the training and testing data
 marbles_train <- training(x = marbles_split)
@@ -139,7 +128,7 @@ marbles_test <- marbles_test %>%
 
 
 
-```{r applying_function}
+```{r apply_function}
 
 accuracy_confusion <- function(color, y_hat) {
   
@@ -247,8 +236,7 @@ predictions_k1=c(1, 1, 0, 0, 1) #calculating Y hat by hand with k=1
 rats_k1_assessment <- bind_cols(
   rats_k1_assessment,
   predictions_k1
-) %>%
-  rename(...3 = y_hat) ## why cannot rename
+)  ## why cannot rename
 
 knitr::kable(rats_k1_assessment) #generating a table
 
@@ -268,8 +256,7 @@ predictions_k3=c(0, 0, 0, 0, 0) #calculating Y hat by hand with k=3
 rats_k3_assessment <- bind_cols(
   rats_k3_assessment,
   predictions_k3
-) %>%
-  rename(...3 = y_hat) ## why cannot rename
+) 
 
 knitr::kable(rats_k1_assessment) #generating a table
 
@@ -289,8 +276,7 @@ predictions_kn=c(1, 1, 1, 1, 1) #calculating Y hat by hand with k=n
 rats_kn_assessment <- bind_cols(
   rats_kn_assessment,
   predictions_kn
-) %>%
-  rename(...3 = y_hat) ## why cannot rename
+) 
 
 knitr::kable(rats_kn_assessment) #generating a table
 
