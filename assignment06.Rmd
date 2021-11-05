@@ -212,34 +212,45 @@ rats_kn <- vfold_cv(data = rats_training,
                     v = 3)
 ```
 
-```{r analysis_data}
+```{r k1}
 
-resample1_data <- rats_k1$splits[[1]] %>%
-  analysis()
+analysis(rats_k1$splits[[1]]) # this is for testing
+assessment(rats_k1$splits[[1]]) # this is for training
 
+# Calculating Y hat by hand with k=1
 
-```
+predictions_k1=c(0, 0, 0, 0, 1, 0, 0, 0, 1, 1)
 
-```{r analysis_resample1}
+rats_k1 <- bind_cols(
+  assessment(rats_k1$splits[[1]])
+  predictions_k1
+)
 
-resample1_assessment <- rats_k1$splits[[1]] %>% #KNN & k=1
-  assessment()
-
-```
-
-```{r analysis_resample2}
-
-
-resample1_assessment <- rats_k3$splits[[1]] %>% #KNN & k=2
-  assessment()
+knitr::kable()
 
 ```
 
+```{r k3}
 
-```{r analysis_resample3}
+analysis(rats_k3$splits[[1]]) # this is for testing
+assessment(rats_k3$splits[[1]]) # this is for training
 
-resample1_assessment <- rats_kn$splits[[1]] %>% #KNN & k=3
-  assessment()
+# Calculating Y hat by hand with k=3
+
+y_hat=c()
 
 ```
+
+```{r kn}
+
+analysis(rats_kn$splits[[1]]) # this is for testing
+assessment(rats_kn$splits[[1]]) # this is for training
+
+# Calculating Y hat by hand with k=n
+
+predictions_kn=c(0, 0, 1, 0, 0, 1, )
+
+```
+
+
 
