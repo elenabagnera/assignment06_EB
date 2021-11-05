@@ -65,7 +65,7 @@ You would get a 1% accuracy if you guess 1 for all observations and 99% if you g
 machine learning tasks?*
 Based on your policy goal, positives, true negatives, false positives, and false negatives carry different costs. This is why it's good to consider other measures other than accuracy, such as sensitivity. In the secodn case for example, it may be very important to predict the 1 right, eveen if that means having a model that has less accuracy. One solution would be to lower the threshold for predicting a 1.
 
-Another point to nitice, is that while the second model is performing significantly better, this is not because it's a better model, but simply because the underlying data is skewed towards 0.
+Another point to notice, is that while the second model is performing significantly better, this is not because it's a better model, but simply because the underlying data is skewed towards 0.
 
 
 ## Question 5
