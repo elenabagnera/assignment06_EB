@@ -59,16 +59,19 @@ You would get a 51% accuracy if you guess 1 for all observations and 49 if you g
 have a value of 1. Approximately what accuracy can be achieved by simply guessing the same value for all
 observations? What number should you predict?*
 
-You would get a 1% accuracy if you guess 1 for all observations and 99% if you guess 0. What you want to predict depends on context. If you are maximizing for efficiency, you should predict 0. 
+You would get a 1% accuracy if you guess 1 for all observations and 99% if you guess 0. What you want to predict depends on context. If you are maximizing for efficiency though, you should predict 0. 
 
 * Explain why it is important to consider context when comparing calculated accuracy in different supervised
 machine learning tasks?*
-Based on your policy goal, positives, true negatives, false positives, and false negatives carry different costs. This is why it's good to consider other measures other than accuracy, such as sensitivity. In the secodn case for example, it may be very important to predict the 1 right, eveen if that means having a model that has less accuracy. One solution would be to lower the threshold for predicting a 1.
 
-Another point to notice, is that while the second model is performing significantly better, this is not because it's a better model, but simply because the underlying data is skewed towards 0.
+Based on your policy goal, false positives, and false negatives carry different costs. This is why it's good to consider other measures other than accuracy, such as sensitivity. In the second case for example, it may be very important to predict the 1 right and not to get a false negative, even if that means having a model that has less accuracy. One solution would be to lower the threshold for predicting a 1.
+
+Another point to notice, is that while the second model is performing significantly better, this is not because it's a better model, but it's because the underlying data is skewed towards 0.
 
 
 ## Question 5
+
+5.1
 
 ```{r loading}
 
@@ -88,6 +91,8 @@ marbles_train_keep <- marbles_train %>%
 
 ```
 
+5.2
+
 We can use a model that predicts black when we have a large sized ball.
 
 ```{r model}
@@ -97,9 +102,9 @@ marbles_train <- marbles_train %>%
   ggplot(aes(x=size, y=n, fill=color))+
   geom_bar(position = "stack", stat="identity") 
 
-
 ```
 
+5.3
 
 ```{r function1}
 
@@ -122,11 +127,11 @@ predict_marbles(x=c("big", "small", "small","big")) #works!
 ```{r applying_function}
 
 marbles_test <- marbles_test %>%
-  mutate(y_hat=predict_marbles(size)) #why using testing data?
+  mutate(y_hat=predict_marbles(size)) 
 
 ```
 
-
+5.4
 
 ```{r apply_function}
 
@@ -151,6 +156,8 @@ accuracy_confusion(marbles_test$color, marbles_test$y_hat) #testing the function
 
 ```
 
+5.5
+
 ```{r decision_tree}
 
 cart_mod <- decision_tree() %>%
@@ -173,9 +180,12 @@ tree_predictions <- bind_cols(
 
 accuracy_confusion(tree_predictions$color, tree_predictions$.pred_class)
 
-# notice that they are producing the same predictions - 76% accuracy. This is because the tree does the same thing as our custom function, it predicts color based on the size. 
-
 ```
+
+5.6
+
+The custom function and decision tree are producing the same predictions (they both have 76% accuracy). This is because the tree does the same thing as our instuitive custom function; it predicts color based on the size. The decision tree picked up on the same rule by looking at the data as we did.
+
 
 ## Question 6
 
@@ -215,7 +225,7 @@ rats_training <- training(split)
 rats_testing <- testing(split)
 
 rats_k1 <- vfold_cv(data = rats_training,
-                    v = 3)
+                    v = 3) #a resample with three folds
 
 rats_k3 <- vfold_cv(data = rats_training,
                     v = 3)
@@ -229,18 +239,16 @@ rats_kn <- vfold_cv(data = rats_training,
 analysis(rats_k1$splits[[1]]) # this is for testing
 assessment(rats_k1$splits[[1]]) # this is for training
 
-rats_k1_assessment <- as_tibble(assessment(rats_k1$splits[[1]])) # creating a tibble for assessment
-
-predictions_k1=c(1, 1, 0, 0, 1) #calculating Y hat by hand with k=1
+predictions_k1 <- data.frame(y_hat=c(0, 0, 1, 0, 0)) # calculating y hat by hand by looking at the closest x in the analysis data
 
 rats_k1_assessment <- bind_cols(
-  rats_k1_assessment,
+  assessment(rats_k1$splits[[1]]),
   predictions_k1
-)  ## why cannot rename
+)  
 
 knitr::kable(rats_k1_assessment) #generating a table
 
-accuracy_confusion(rats_k1_assessment$rat_burrow, rats_k1_assessment$...3) # only 20% accuracy
+accuracy_confusion(rats_k1_assessment$rat_burrow, rats_k1_assessment$y_hat) # 60% accuracy
 
 ```
 
@@ -249,18 +257,18 @@ accuracy_confusion(rats_k1_assessment$rat_burrow, rats_k1_assessment$...3) # onl
 analysis(rats_k3$splits[[1]]) # this is for testing
 assessment(rats_k3$splits[[1]]) # this is for training
 
-rats_k3_assessment <- as_tibble(assessment(rats_k3$splits[[1]])) # creating a tibble for assessment
+predictions_k3 <- data.frame(y_hat=c(1, 1, 1, 0, 1)) 
 
-predictions_k3=c(0, 0, 0, 0, 0) #calculating Y hat by hand with k=3
 
 rats_k3_assessment <- bind_cols(
-  rats_k3_assessment,
+  assessment(rats_k3$splits[[1]]),
   predictions_k3
-) 
+)
 
-knitr::kable(rats_k1_assessment) #generating a table
+knitr::kable(rats_k3_assessment) #generating a table
 
-accuracy_confusion(rats_k3_assessment$rat_burrow, rats_k3_assessment$...3) # 80% accuracy
+accuracy_confusion(rats_k3_assessment$rat_burrow, rats_k3_assessment$y_hat) # 40% accuracy
+
 
 ```
 
@@ -269,21 +277,19 @@ accuracy_confusion(rats_k3_assessment$rat_burrow, rats_k3_assessment$...3) # 80%
 analysis(rats_kn$splits[[1]]) # this is for testing
 assessment(rats_kn$splits[[1]]) # this is for training
 
-rats_kn_assessment <- as_tibble(assessment(rats_kn$splits[[1]])) # creating a tibble for assessment
-
-predictions_kn=c(1, 1, 1, 1, 1) #calculating Y hat by hand with k=n
+predictions_kn <- data.frame(y_hat=c(0, 0, 0, 0, 0)) #calculating Y hat by hand with k=10
 
 rats_kn_assessment <- bind_cols(
-  rats_kn_assessment,
+  assessment(rats_kn$splits[[1]]),
   predictions_kn
 ) 
 
 knitr::kable(rats_kn_assessment) #generating a table
 
-accuracy_confusion(rats_kn_assessment$rat_burrow, rats_k3_assessment$...3) # 40% accuracy
+accuracy_confusion(rats_kn_assessment$rat_burrow, rats_kn_assessment$y_hat) # 40% accuracy
 
 
 ```
 
-The last was the easiest because we were just taking the majority? Hardest was the first one?
+The last was the easiest the compute because we were just taking the mode. The hardest was probably the second one, with k=3, since we had to look across the predictions of 3 observations and take the mode out of those.
 
