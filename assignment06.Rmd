@@ -23,7 +23,7 @@ MAE=1.6
 Because of the squaring, RMSE penalizes large errors more than MSA does.
 
 ```{r rmse}
-knitr::include_graphics("image0 (1).jpeg")
+knitr::include_graphics("Images/image0 (1).jpeg")
 
 ```
 
@@ -34,7 +34,7 @@ PRECISION= 75%
 RECALL/SENSITIVITY= 60%
 
 ```{r confusion}
-knitr::include_graphics("image2.jpeg")
+knitr::include_graphics("Images/image2.jpeg")
 ```
 
 
@@ -44,7 +44,7 @@ ACCURACY= 67%
 MISSCLASSIFICATION RATE= 34%
 
 ```{r multiclass}
-knitr::include_graphics("image3.jpg")
+knitr::include_graphics("Images/image3.jpg")
 ```
 
 ## Question 4
@@ -55,13 +55,13 @@ observations? What number should you predict?*
 
 You would get a 51% accuracy if you guess 1 for all observations and 49 if you guess 0. To maximize accuracy, you would predict 1.
 
-* Consider a population where it is known that 0.99 of observations have a value of 0 and 0.01 of observations
+*Consider a population where it is known that 0.99 of observations have a value of 0 and 0.01 of observations
 have a value of 1. Approximately what accuracy can be achieved by simply guessing the same value for all
 observations? What number should you predict?*
 
 You would get a 1% accuracy if you guess 1 for all observations and 99% if you guess 0. What you want to predict depends on context. If you are maximizing for efficiency though, you should predict 0. 
 
-* Explain why it is important to consider context when comparing calculated accuracy in different supervised
+*Explain why it is important to consider context when comparing calculated accuracy in different supervised
 machine learning tasks?*
 
 Based on your policy goal, false positives, and false negatives carry different costs. This is why it's good to consider other measures other than accuracy, such as sensitivity. In the second case for example, it may be very important to predict the 1 right and not to get a false negative, even if that means having a model that has less accuracy. One solution would be to lower the threshold for predicting a 1.
@@ -73,7 +73,7 @@ Another point to notice, is that while the second model is performing significan
 
 5.1
 
-```{r loading}
+```{r loading, message=FALSE}
 
 set.seed(20200229)
 
@@ -127,7 +127,7 @@ predict_marbles(x=c("big", "small", "small","big")) #works!
 ```{r applying_function}
 
 marbles_test <- marbles_test %>%
-  mutate(y_hat=predict_marbles(size)) 
+  mutate(y_hat=predict_marbles(size))  # applying the function
 
 ```
 
@@ -151,14 +151,14 @@ return(list(accuracy, confusion))
   
 accuracy_confusion(marbles_test$color, marbles_test$y_hat) #testing the function on the testing dataset 
 
-#accuracy us 76% and the confusion matrix is below
+#accuracy is 76%
 
 
 ```
 
 5.5
 
-```{r decision_tree}
+```{r decision_tree, message=FALSE}
 
 cart_mod <- decision_tree() %>%
   set_engine(engine="rpart") %>%
@@ -167,7 +167,7 @@ cart_mod <- decision_tree() %>%
 cart_fit <- cart_mod %>% #fitting the model
   fit(formula= color ~., data=marbles_train_keep) #using the original train data set where color is a factor
 
-rpart.plot::rpart.plot(x=cart_fit$fit) # creating a tree
+rpart.plot::rpart.plot(x=cart_fit$fit, roundint=TRUE) # creating a tree
 
 ```
 
